@@ -1,61 +1,105 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistema de Votação - Teste Avaliativo Signo Technology
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Este projeto é um sistema de votação e gerenciamento de enquetes desenvolvido como parte de um teste avaliativo. Ele permite a criação, edição e exclusão de enquetes por administradores, com um sistema de aprovação para novos administradores, e permite que usuários registrados votem nas enquetes ativas. A atualização dos resultados da votação na tela da enquete ocorre automaticamente via polling.
 
-## About Laravel
+## Tecnologias Utilizadas
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+* **Backend:** Laravel 11 (PHP 8.3)
+* **Frontend:** Blade Templates, Tailwind CSS, Vanilla JavaScript (para Polling)
+* **Banco de Dados:** MySQL
+* **Autenticação/Autorização:** Laravel Breeze, com separação de papéis (Guest, Admin Pendente, Admin, Super Admin)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Como Rodar o Projeto Localmente
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Siga os passos abaixo para configurar e executar o projeto em seu ambiente de desenvolvimento:
 
-## Learning Laravel
+1.  **Clone o Repositório:**
+    ```bash
+    git clone [URL_DO_SEU_REPOSITORIO_GITHUB]
+    cd sistema-votacao
+    ```
+    *(Substitua pela URL real do seu repositório)*
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+2.  **Instale as Dependências:**
+    ```bash
+    composer install
+    npm install
+    ```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+3.  **Configure o Ambiente:**
+    * Copie o arquivo de exemplo `.env.example` para `.env`:
+        ```bash
+        cp .env.example .env
+        ```
+    * Crie um banco de dados MySQL vazio para o projeto (ex: `votacao_db`).
+    * Abra o arquivo `.env` e configure as credenciais do seu banco de dados:
+        ```dotenv
+        DB_CONNECTION=mysql
+        DB_HOST=127.0.0.1
+        DB_PORT=3306
+        DB_DATABASE=votacao_db # Ou o nome que você criou
+        DB_USERNAME=root      # Seu usuário MySQL
+        DB_PASSWORD=          # Sua senha MySQL (pode ser vazia se usar Laragon padrão)
+        ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+4.  **Gere a Chave da Aplicação e Rode as Migrações:**
+    ```bash
+    php artisan key:generate
+    php artisan migrate:fresh
+    ```
+    *(O comando `migrate:fresh` limpará o banco e criará todas as tabelas necessárias).*
 
-## Laravel Sponsors
+5.  **Compile os Assets de Frontend:**
+    ```bash
+    npm run build
+    ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+6.  **Inicie os Servidores:**
+    Você precisará de **dois** terminais abertos na pasta do projeto:
+    * **Terminal 1 (Servidor Web):**
+        ```bash
+        php artisan serve
+        ```
+    * **Terminal 2 (Compilador Vite):**
+        ```bash
+        npm run dev
+        ```
 
-### Premium Partners
+7.  **Acesse o Sistema:** Abra seu navegador e acesse `http://127.0.0.1:8000` (ou a URL fornecida pelo `php artisan serve`).
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Como Usar (Fluxo de Teste Sugerido)
 
-## Contributing
+1.  **Crie o Super Admin ("Chefe"):**
+    * Acesse `http://127.0.0.1:8000`.
+    * Clique em "Solicitar Acesso de Admin" e preencha o formulário para criar sua conta principal.
+    * **Importante:** Acesse seu gerenciador de banco de dados (HeidiSQL, phpMyAdmin, etc.), abra a tabela `users` do banco `votacao_db`, encontre o usuário que você acabou de criar e altere:
+        * `admin_status` de `pending` para `admin`.
+        * `is_super_admin` de `0` para `1`.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+2.  **Acesse como Super Admin:**
+    * Faça login com a conta que você acabou de promover (`http://127.0.0.1:8000/login`).
+    * Você será direcionado para o Dashboard de Administração (`/admin/dashboard`).
 
-## Code of Conduct
+3.  **Crie e Gerencie Enquetes:**
+    * Use o botão "Nova Enquete" para criar algumas enquetes. Certifique-se de criar pelo menos uma com datas que a tornem "Em Andamento".
+    * Teste as funcionalidades de Editar (ícone de lápis) e Excluir (ícone de lixeira) na lista.
+    * Teste os filtros de status (Todas, Em Andamento, etc.).
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+4.  **Simule um Visitante e um Admin Pendente:**
+    * Abra uma **janela anônima** do navegador.
+    * Acesse `http://127.0.0.1:8000`.
+    * Crie uma conta usando "Registrar como Visitante". Faça login e veja o `/guest/dashboard`. Teste o acesso à página de votação clicando no ícone de olho.
+    * Faça Log Out.
+    * Crie outra conta usando "Solicitar Acesso de Admin". Faça login. Você verá o dashboard de visitante com o aviso de "Solicitação Pendente".
 
-## Security Vulnerabilities
+5.  **Aprove o Admin Pendente:**
+    * Volte para a janela onde você está logado como Super Admin.
+    * No menu superior direito (clique no seu nome), vá para "Aprovar Admins".
+    * Use os ícones para aprovar (círculo com check) o usuário que estava pendente.
+    * Na janela anônima, faça Log Out e Log In novamente com o usuário que era pendente. Ele agora deve ser direcionado para o `/admin/dashboard`.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+6.  **Teste a Atualização Automática (Polling):**
+    * Abra duas janelas do navegador (podem ser duas normais, logadas com usuários diferentes, ou uma normal e uma anônima logada).
+    * Navegue para a **mesma** página de votação de uma enquete "Em Andamento" em ambas as janelas (clicando no ícone de olho no dashboard).
+    * Vote em uma das janelas.
+    * Observe a outra janela: os resultados (contagem de votos e barra de progresso) devem se atualizar automaticamente após alguns segundos (o intervalo está definido como 2 segundos).
